@@ -21,25 +21,28 @@ const pgClient = new Pool({
     port: keys.pgPort
 });
 pgClient.on('error', () => console.log(constants.LOST_PG_CONNECTION_MESSAGE));
-pgClient
-    .query(constants.PG_CLIENT_CREATE_TODO_TABLE)
-    .catch(error => console.log(error, 'not able to create table'));
-pgClient
-    .query(constants.PG_CLIENT_CREATE_BUCKETS_TABLE)
-    .catch(error => console.log(error, 'not able to create table'));
+pgClient.on('connect', () => {
+    pgClient
+        .query(constants.PG_DB_INIT_TABLE)
+        .catch(error => console.log(error, 'not able to create tables'));
+    pgClient
+        .query(constants.CREATE_UUID_OOSP)
+        .catch(error => console.log(error, 'not able to create extension'));
+    pgClient
+        .query(constants.PG_DB_INIT_FUNCTION)
+        .catch(error => console.log(error, 'not able to create functions'));
+});
 // Postgres Client Setup ends ---------------
 
 // Express Route Handlers starts ---------------
 app.get('/', (req, res) => {
     res.send('Hi');
 });
+
+// TODO APIs
 app.get('/gettodos', async (req, res) => {
-    const values = await pgClient.query(constants.PG_CLIENT_SELECT_ALL_VALUES_TABLE_QUERY);
-    res.send(values.rows);
-});
-app.get('/getbuckets', async (req, res) => {
-    const values = await pgClient.query(constants.PG_CLIENT_SELECT_ALL_VALUES_TABLE_QUERY);
-    res.send(values.rows);
+    const values = await pgClient.query('select get_all_buckets()');
+    res.send(values);
 });
 app.post('/savetodo', async (req, res) => {
     const index = req.body.index;
@@ -50,6 +53,20 @@ app.post('/savetodo', async (req, res) => {
     pgClient.query(constants.PG_CLIENT_INSERT_VALUE_TABLE_QUERY, [index]);
 
     res.send({ working: true });
+});
+
+// Buckets APIs
+app.get('/getbuckets', async (req, res) => {
+    const values = await pgClient.query('select get_all_buckets()');
+    res.send(values.rows);
+});
+app.post('/savebucket', async (req, res) => {
+    const values = await pgClient.query('select save_bucket($1, $2, $3)', [req.id, req.title, req.color]);
+    res.send(values.rows);
+});
+app.post('/removebucket', async (req, res) => {
+    const values = await pgClient.query('select remove_bucket($1)', [req.id]);
+    res.send(values.rows);
 });
 
 app.listen(5000, error => {
