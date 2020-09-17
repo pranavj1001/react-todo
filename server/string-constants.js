@@ -28,7 +28,7 @@ BEGIN
 			SET 
 				title = par_buckettitle, 
 				color = par_bucketcolor,
-				modifieddate = (select noww())
+				modifieddate = (select now())
 			WHERE 
 				id = par_bucketid;
 			var_data := 'Bucket updated.';
@@ -272,6 +272,18 @@ BEGIN
 		'data', var_data,
 		'error', var_error
 	);
+END;
+$BODY$;
+
+
+CREATE OR REPLACE FUNCTION public.test_function()
+    RETURNS int
+    LANGUAGE 'plpgsql'
+
+AS $BODY$
+DECLARE
+BEGIN
+	RETURN 0;
 END;
 $BODY$;
 `;
