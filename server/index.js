@@ -41,18 +41,18 @@ app.get('/', (req, res) => {
 
 // TODO APIs
 app.get('/gettodos', async (req, res) => {
-    const values = await pgClient.query('select get_all_buckets()');
-    res.send(values);
+    const values = await pgClient.query('select get_all_todos()');
+    res.send(values.rows);
 });
 app.post('/savetodo', async (req, res) => {
-    const index = req.body.index;
-    if (parseInt(index) > 40) {
-        return  res.status(422).send(constants.INDEX_VALUE_TOO_HIGH_MESSAGE);
-    }
-    // save in postgres database
-    pgClient.query(constants.PG_CLIENT_INSERT_VALUE_TABLE_QUERY, [index]);
-
-    res.send({ working: true });
+    const values = await pgClient.query(
+        'select save_todo($1::uuid, $2, $3, $4::bool, $5::uuid[])', 
+        [req.body.id, req.body.title, req.body.content, req.body.iscompleted, req.body.buckets]);
+    res.send(values.rows);
+});
+app.post('/removetodo', async (req, res) => {
+    const values = await pgClient.query('select remove_todo($1::uuid)', [req.body.id]);
+    res.send(values.rows);
 });
 
 // Buckets APIs
@@ -61,7 +61,7 @@ app.get('/getbuckets', async (req, res) => {
     res.send(values.rows);
 });
 app.post('/savebucket', async (req, res) => {
-    const values = await pgClient.query('select save_bucket($1, $2, $3)', [req.body.id, req.body.title, req.body.color]);
+    const values = await pgClient.query('select save_bucket($1::uuid, $2, $3)', [req.body.id, req.body.title, req.body.color]);
     res.send(values.rows);
 });
 app.post('/removebucket', async (req, res) => {
