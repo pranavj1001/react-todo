@@ -61,11 +61,11 @@ app.get('/getbuckets', async (req, res) => {
     res.send(values.rows);
 });
 app.post('/savebucket', async (req, res) => {
-    const values = await pgClient.query('select save_bucket($1, $2, $3)', [req.id, req.title, req.color]);
+    const values = await pgClient.query('select save_bucket($1, $2, $3)', [req.body.id, req.body.title, req.body.color]);
     res.send(values.rows);
 });
 app.post('/removebucket', async (req, res) => {
-    const values = await pgClient.query('select remove_bucket($1)', [req.id]);
+    const values = await pgClient.query('select remove_bucket($1::uuid)', [req.body.id]);
     res.send(values.rows);
 });
 
