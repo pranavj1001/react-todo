@@ -21,16 +21,37 @@ const pgClient = new Pool({
     port: keys.pgPort
 });
 pgClient.on('error', () => console.log(constants.LOST_PG_CONNECTION_MESSAGE));
-pgClient.on('connect', () => {
-    pgClient
-        .query(constants.PG_DB_INIT_TABLE)
-        .catch(error => console.log(error, 'not able to create tables'));
-    pgClient
-        .query(constants.CREATE_UUID_OOSP)
-        .catch(error => console.log(error, 'not able to create extension'));
-    pgClient
-        .query(constants.PG_DB_INIT_FUNCTION)
-        .catch(error => console.log(error, 'not able to create functions'));
+// pgClient.on('connect', () => {
+//     pgClient
+//         .query(constants.PG_DB_INIT_TABLE)
+//         .catch(error => console.log(error, 'not able to create tables'));
+//     pgClient
+//         .query(constants.CREATE_UUID_OOSP)
+//         .catch(error => console.log(error, 'not able to create extension'));
+//     pgClient
+//         .query(constants.PG_DB_INIT_FUNCTION)
+//         .catch(error => console.log(error, 'not able to create functions'));
+// });
+pgClient.connect((err, client, release) => {
+    if (err) {
+        return console.error('Error acquiring client', err.stack)
+    }
+    client.query(constants.PG_DB_INIT_TABLE, (err, result) => {
+        if (err) {
+            return console.error('Error Creating Tables', err.stack);
+        }
+    });
+    client.query(constants.CREATE_UUID_OOSP, (err, result) => {
+        if (err) {
+            return console.error('Error Creating Extension', err.stack);
+        }
+    });
+    client.query(constants.PG_DB_INIT_FUNCTION, (err, result) => {
+        release();
+        if (err) {
+            return console.error('Error Creating Function', err.stack);
+        }
+    });
 });
 // Postgres Client Setup ends ---------------
 
