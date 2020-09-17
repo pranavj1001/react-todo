@@ -1,6 +1,7 @@
 const DATABASE_INIT_TABLE_CODE = `
-CREATE TABLE IF NOT EXISTS todos (id UUID, title TEXT, content TEXT, iscompleted BOOLEAN, buckets UUID[], createddate TIMESTAMP WITH TIME ZONE, modifieddate TIMESTAMP WITH TIME ZONE, isactive BOOLEAN);
-CREATE TABLE IF NOT EXISTS buckets (id UUID, title TEXT, color text, createddate TIMESTAMP WITH TIME ZONE, modifieddate TIMESTAMP WITH TIME ZONE, isactive BOOLEAN);`;
+CREATE TABLE IF NOT EXISTS todos (id UUID, title TEXT, content TEXT, iscompleted BOOLEAN, createddate TIMESTAMP WITH TIME ZONE, modifieddate TIMESTAMP WITH TIME ZONE, isactive BOOLEAN);
+CREATE TABLE IF NOT EXISTS buckets (id UUID, title TEXT, color text, createddate TIMESTAMP WITH TIME ZONE, modifieddate TIMESTAMP WITH TIME ZONE, isactive BOOLEAN);
+CREATE TABLE IF NOT EXISTS todos_buckets_mapping (id UUID, todoid uuid, bucketid uuid);`;
 
 const DATABASE_INIT_FUNCTION_CODE = `
 CREATE OR REPLACE FUNCTION public.save_bucket(
@@ -73,6 +74,7 @@ BEGIN
 	var_error := '';
 	BEGIN
 		IF EXISTS (SELECT * FROM buckets WHERE id = par_bucketid AND isactive = true) THEN
+			DELETE FROM todos_buckets_mapping WHERE bucketid = par_bucketid;
 			UPDATE buckets SET isactive = false WHERE id = par_bucketid;
 			var_statuscode := 0;
 			var_data := 'Bucket is now inactive.';
@@ -143,7 +145,8 @@ CREATE OR REPLACE FUNCTION public.save_todo(
 	par_title text DEFAULT NULL::text,
 	par_content text DEFAULT NULL::text,
 	par_iscompleted boolean DEFAULT NULL::boolean,
-	par_buckets uuid[] DEFAULT NULL::uuid[])
+	par_buckets uuid[] DEFAULT NULL::uuid[],
+	par_isbucketchanged boolean DEFAULT true)
     RETURNS json
     LANGUAGE 'plpgsql'
 
@@ -152,6 +155,7 @@ DECLARE
 var_data text;
 var_statuscode int;
 var_error text;
+var_todoid uuid;
 BEGIN
 	var_error := '';
 	var_statuscode := 0;
@@ -163,23 +167,38 @@ BEGIN
 				title = par_title, 
 				content = par_content,
 				iscompleted = par_iscompleted,
-				buckets = par_buckets,
 				modifieddate = (select now())
 			WHERE 
 				id = par_id;
+			IF par_isbucketchanged = true THEN
+				DELETE FROM todos_buckets_mapping WHERE todoid = par_id;
+				INSERT INTO todos_buckets_mapping
+					(id, todoid, bucketid)
+				VALUES
+					(uuid_generate_v4(),
+					par_id,
+					UNNEST(par_buckets));
+			END IF;
+			
 			var_data := 'Todo updated.';
 		ELSE
+			var_todoid = (SELECT uuid_generate_v4());
 			INSERT INTO todos 
-				(id, title, content, iscompleted, buckets, createddate, modifieddate, isactive) 
+				(id, title, content, iscompleted, createddate, modifieddate, isactive) 
 			VALUES
-				(uuid_generate_v4(), 
+				(var_todoid, 
 				 par_title, 
 				 par_content,
 				 par_iscompleted,
-				 par_buckets,
 				 (select now()),
 				 (select now()),
 				 true);
+			INSERT INTO todos_buckets_mapping
+				(id, todoid, bucketid)
+			VALUES
+				(uuid_generate_v4(),
+				 var_todoid,
+				 UNNEST(par_buckets));
 			var_data := 'New Todo inserted.';
 		END IF;
 
@@ -210,6 +229,7 @@ BEGIN
 	var_error := '';
 	BEGIN
 		IF EXISTS (SELECT * FROM todos WHERE id = par_todoid AND isactive = true) THEN
+			DELETE FROM todos_buckets_mapping WHERE todoid = par_todoid;
 			UPDATE todos SET isactive = false WHERE id = par_todoid;
 			var_statuscode := 0;
 			var_data := 'Todo is now inactive.';

@@ -57,7 +57,7 @@ pgClient.connect((err, client, release) => {
 
 // Express Route Handlers starts ---------------
 app.get('/', (req, res) => {
-    res.send('Hi');
+    res.send('Server is up and running!');
 });
 
 // TODO APIs
@@ -67,8 +67,8 @@ app.get('/gettodos', async (req, res) => {
 });
 app.post('/savetodo', async (req, res) => {
     const values = await pgClient.query(
-        'select save_todo($1::uuid, $2, $3, $4::bool, $5::uuid[])', 
-        [req.body.id, req.body.title, req.body.content, req.body.iscompleted, req.body.buckets]);
+        'select save_todo($1::uuid, $2, $3, $4::bool, $5::uuid[], $6::bool)', 
+        [req.body.id, req.body.title, req.body.content, req.body.isCompleted, req.body.buckets, req.body.isBucketChanged]);
     res.send(values.rows);
 });
 app.post('/removetodo', async (req, res) => {
