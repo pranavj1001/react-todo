@@ -9,6 +9,7 @@
     left: 30px;
     bottom: 0;
     margin: 0;
+    font-weight: 300;
 }
 
 @media (min-width: 786px) {

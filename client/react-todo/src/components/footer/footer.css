@@ -5,6 +5,7 @@
     height: 60px;
     line-height: 60px;
     text-align: center;
+    color: #444444;
 }
 
 .footer--heart {
@@ -12,11 +13,11 @@
 }
 
 .footer--link {
-    color: #000000;
+    color: #444444;
     font-style: italic;
 }
 
 .footer--link:hover {
-    color: #000000;
+    color: #444444;
     text-decoration: none;
 }
