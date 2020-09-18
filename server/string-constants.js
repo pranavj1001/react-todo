@@ -1,7 +1,31 @@
 const DATABASE_INIT_TABLE_CODE = `
-CREATE TABLE IF NOT EXISTS todos (id UUID, title TEXT, content TEXT, iscompleted BOOLEAN, createddate TIMESTAMP WITH TIME ZONE, modifieddate TIMESTAMP WITH TIME ZONE, isactive BOOLEAN);
-CREATE TABLE IF NOT EXISTS buckets (id UUID, title TEXT, color text, createddate TIMESTAMP WITH TIME ZONE, modifieddate TIMESTAMP WITH TIME ZONE, isactive BOOLEAN);
-CREATE TABLE IF NOT EXISTS todos_buckets_mapping (id UUID, todoid uuid, bucketid uuid);`;
+CREATE TABLE IF NOT EXISTS todos (
+	id UUID, 
+	title TEXT, 
+	content TEXT, 
+	iscompleted BOOLEAN, 
+	createddate TIMESTAMP WITH TIME ZONE,
+	modifieddate TIMESTAMP WITH TIME ZONE, 
+	isactive BOOLEAN,
+	PRIMARY KEY(id)
+);
+CREATE TABLE IF NOT EXISTS buckets (
+	id UUID, 
+	title TEXT, 
+	color text, 
+	createddate TIMESTAMP WITH TIME ZONE, 
+	modifieddate TIMESTAMP WITH TIME ZONE, 
+	isactive BOOLEAN,
+	PRIMARY KEY(id)
+);
+CREATE TABLE IF NOT EXISTS todos_buckets_mapping (
+	id UUID, 
+	todoid uuid, 
+	bucketid uuid, 
+	PRIMARY KEY(id), 
+	CONSTRAINT fk_todoid FOREIGN KEY(todoid) REFERENCES todos(id), 
+	CONSTRAINT fk_bucketid FOREIGN KEY(bucketid) REFERENCES buckets(id)
+);`;
 
 const DATABASE_INIT_FUNCTION_CODE = `
 CREATE OR REPLACE FUNCTION public.save_bucket(
@@ -19,20 +43,25 @@ var_error text;
 BEGIN
 	var_error := '';
 	BEGIN
-		IF EXISTS (SELECT * FROM buckets WHERE title = par_buckettitle AND isactive = true) THEN
+		IF EXISTS (SELECT * FROM buckets WHERE lower(title) = lower(par_buckettitle) AND isactive = true) AND (par_bucketid IS NULL) THEN
 			var_statuscode := 1;
 			var_data := 'Bucket already exists.';
 		ELSIF par_bucketid IS NOT NULL THEN
-			var_statuscode := 0;
-			UPDATE 
-				buckets 
-			SET 
-				title = par_buckettitle, 
-				color = par_bucketcolor,
-				modifieddate = (select now())
-			WHERE 
-				id = par_bucketid;
-			var_data := 'Bucket updated.';
+			IF EXISTS (SELECT * FROM buckets WHERE id = par_bucketid AND isactive = true) THEN
+				UPDATE 
+					buckets 
+				SET 
+					title = par_buckettitle, 
+					color = par_bucketcolor,
+					modifieddate = (select now())
+				WHERE 
+					id = par_bucketid;
+					var_statuscode := 0;
+				var_data := 'Bucket updated.';
+			ELSE
+				var_statuscode := 2;
+				var_data := 'Bucket is inactive.';
+			END IF;
 		ELSE
 			var_statuscode := 0;
 			INSERT INTO 
@@ -48,7 +77,7 @@ BEGIN
 		END IF;
 
 		EXCEPTION WHEN others THEN
-			var_statuscode := 2;
+			var_statuscode := 3;
 			var_error := 'Some error occurred while inserting the Bucket.';
 	END;
 	RETURN json_build_object(
@@ -84,7 +113,7 @@ BEGIN
 		END IF;
 
 		EXCEPTION WHEN others THEN
-			var_statuscode := 2;
+			var_statuscode := 3;
 			var_error := 'Some error occurred while removing the Bucket.';
 	END;
 	RETURN json_build_object(
@@ -111,7 +140,7 @@ BEGIN
 	var_statuscode := 0;
 	var_error := '';
 	BEGIN
-		var_data := (SELECT array_to_json(array_agg(row_to_json(t))) FROM (
+		var_data := (SELECT json_agg(t) FROM (
 						SELECT 
 							id, 
 							title, 
@@ -127,7 +156,7 @@ BEGIN
 					) t)::json;
 		
 		EXCEPTION WHEN others THEN
-			var_statuscode := 11;
+			var_statuscode := 3;
 			var_error := 'Some error occurred while preparing the json object';
 	END;
 	
@@ -175,9 +204,11 @@ BEGIN
 				INSERT INTO todos_buckets_mapping
 					(id, todoid, bucketid)
 				VALUES
-					(uuid_generate_v4(),
-					par_id,
-					UNNEST(par_buckets));
+					(
+						uuid_generate_v4(),
+						var_todoid,
+						UNNEST(par_buckets)
+					);
 			END IF;
 			
 			var_data := 'Todo updated.';
@@ -196,14 +227,16 @@ BEGIN
 			INSERT INTO todos_buckets_mapping
 				(id, todoid, bucketid)
 			VALUES
-				(uuid_generate_v4(),
-				 var_todoid,
-				 UNNEST(par_buckets));
+				(
+					uuid_generate_v4(),
+					var_todoid,
+					UNNEST(par_buckets)
+				);
 			var_data := 'New Todo inserted.';
 		END IF;
 
 		EXCEPTION WHEN others THEN
-			var_statuscode := 2;
+			var_statuscode := 3;
 			var_error := 'Some error occurred while inserting the Todo.';
 	END;
 	RETURN json_build_object(
@@ -239,7 +272,7 @@ BEGIN
 		END IF;
 
 		EXCEPTION WHEN others THEN
-			var_statuscode := 2;
+			var_statuscode := 3;
 			var_error := 'Some error occurred while removing the Todo.';
 	END;
 	RETURN json_build_object(
@@ -265,25 +298,36 @@ BEGIN
 	var_statuscode := 0;
 	var_error := '';
 	BEGIN
-		var_data := (SELECT array_to_json(array_agg(row_to_json(t))) FROM (
+		var_data := (SELECT json_agg(t1) FROM (
 						SELECT 
 							id, 
 							title, 
 							content, 
 							iscompleted,
-							buckets,
+							(
+								SELECT 
+									json_agg(t2) 
+								FROM (
+									SELECT 
+										tbm.bucketid 
+									FROM 
+										todos_buckets_mapping tbm
+									WHERE 
+										tbm.todoid = tot.id
+								) t2
+							) AS buckets,
 							createddate,
 							modifieddate
 						FROM 
-							todos 
+							todos tot
 						WHERE 
 							isactive = true
 						ORDER BY
 							createddate
-					) t)::json;
+					) t1)::json;
 		
 		EXCEPTION WHEN others THEN
-			var_statuscode := 11;
+			var_statuscode := 3;
 			var_error := 'Some error occurred while preparing the json object';
 	END;
 	
