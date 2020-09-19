@@ -27,6 +27,7 @@
 
 .tile--paragraph-heading {
     font-size: 1.5rem;
+    mix-blend-mode: difference;
 }
 
 .tile--paragraph-content {

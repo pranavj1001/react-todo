@@ -31,7 +31,7 @@ class TodosShowcase extends Component {
 
         return this.props.todoData.data.map(todo => {
             if (todo.iscompleted) {
-                todo.color = 'rgba(66, 103, 178, 0.8)';
+                todo.color = 'rgba(66, 103, 178, 0.7)';
             } else {
                 todo.color = 'rgba(66, 103, 178, 1)';
             }
@@ -51,9 +51,9 @@ class TodosShowcase extends Component {
                 <div className="todo-showcase--tools">
                     <div className="row">
                         <div className="col-md-4">
-                            <div class="input-group mb-3 todo-showcase--search-input-group">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" id="inputGroup-sizing-default">Search Text:</span>
+                            <div className="input-group mb-3 todo-showcase--search-input-group">
+                                <div className="input-group-prepend">
+                                    <span className="input-group-text" id="inputGroup-sizing-default">Search Text:</span>
                                 </div>
                                 <input 
                                 type="text" 

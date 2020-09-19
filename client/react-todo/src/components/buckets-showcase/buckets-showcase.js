@@ -2,13 +2,14 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Link } from "react-router-dom";
 
-import { getBucketList } from '../../actions/bucket-actions';
+import { getBucketList, resetBucketState } from '../../actions/bucket-actions';
 import Tile from '../tile/tile';
 
 import './buckets-showcase.css';
 
 class BucketsShowcase extends Component {
     componentDidMount() {
+        this.props.resetBucketState();
         this.props.getBucketList();
     }
 
@@ -31,9 +32,10 @@ class BucketsShowcase extends Component {
 
         return this.props.bucketData.data.map(bucket => {
             
-            bucket.link = `/todo/addedit/${bucket.id}`;
+            bucket.link = `/bucket/addedit/${bucket.id}`;
+            bucket.color = '#' + bucket.color;
             return (
-                <div key={bucket.id} className="col-xl-6 bucket-showcase--tile">
+                <div key={bucket.id} className="col-md-6 col-xl-3 bucket-showcase--tile">
                     <Tile data={bucket} />
                 </div>
             );
@@ -47,9 +49,9 @@ class BucketsShowcase extends Component {
                 <div className="bucket-showcase--tools">
                     <div className="row">
                         <div className="col-md-4">
-                            <div class="input-group mb-3 bucket-showcase--search-input-group">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" id="inputGroup-sizing-default">Search Text:</span>
+                            <div className="input-group mb-3 bucket-showcase--search-input-group">
+                                <div className="input-group-prepend">
+                                    <span className="input-group-text" id="inputGroup-sizing-default">Search Text:</span>
                                 </div>
                                 <input 
                                 type="text" 
@@ -74,7 +76,7 @@ class BucketsShowcase extends Component {
 }
 
 const mapStateToProps = ({ bucketData }) => {
-    return { bucketData }
+    return { bucketData: bucketData.getListResponse };
 };
 
-export default connect(mapStateToProps, { getBucketList })(BucketsShowcase);
+export default connect(mapStateToProps, { getBucketList, resetBucketState })(BucketsShowcase);

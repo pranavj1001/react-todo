@@ -32,9 +32,7 @@ function App() {
           <Route path="/buckets">
             <BucketsShowcase />
           </Route>
-          <Route path="/bucket/addedit/:bucketId?">
-            <BucketItem />
-          </Route>
+          <Route path="/bucket/addedit/:bucketId?" component={BucketItem} />
           <Route path="/">
             <Home />
           </Route>

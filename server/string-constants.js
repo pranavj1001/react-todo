@@ -147,8 +147,8 @@ BEGIN
 								id, 
 								title, 
 								color,
-								createddate,
-								modifieddate
+								createddate AS createdDate,
+								modifieddate AS modifiedDate
 							FROM 
 								buckets 
 							WHERE 
@@ -162,8 +162,8 @@ BEGIN
 								id, 
 								title, 
 								color,
-								createddate,
-								modifieddate
+								createddate AS createdDate,
+								modifieddate AS modifiedDate
 							FROM 
 								buckets 
 							WHERE 
@@ -340,8 +340,8 @@ BEGIN
 											tbm.todoid = tot.id
 									) t2
 								) AS buckets,
-								createddate,
-								modifieddate
+								createddate AS createdDate,
+								modifieddate AS modifiedDate
 							FROM 
 								todos tot
 							WHERE 
@@ -372,8 +372,8 @@ BEGIN
 											tbm.todoid = tot.id
 									) t2
 								) AS buckets,
-								createddate,
-								modifieddate
+								createddate AS createdDate,
+								modifieddate AS modifiedDate
 							FROM 
 								todos tot
 							WHERE 
@@ -393,18 +393,6 @@ BEGIN
 		'data', var_data,
 		'error', var_error
 	);
-END;
-$BODY$;
-
-
-CREATE OR REPLACE FUNCTION public.test_function()
-    RETURNS int
-    LANGUAGE 'plpgsql'
-
-AS $BODY$
-DECLARE
-BEGIN
-	RETURN 0;
 END;
 $BODY$;
 `;
