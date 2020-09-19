@@ -17,7 +17,6 @@ import './bucket-item.css';
 class BucketItem extends Component {
     componentDidMount() {
         const { bucketId } = this.props.match.params;
-        console.log(bucketId);
         if (bucketId) {
             this.props.getSingleBucket(bucketId);
         }
@@ -48,8 +47,9 @@ class BucketItem extends Component {
     }
 
     showAlertOnSuccessfulSave = () => {
-        if (this.props.saveBucketResponse.status &&
+        if (this.props.saveBucketResponse.status !== undefined &&
             this.props.saveBucketResponse.status === 0) {
+                console.log(this.props.saveBucketResponse.status);
                 return (
                     <div className="alert alert-success bucket-item--alert" role="alert">
                         Changes were saved successfully
@@ -59,7 +59,7 @@ class BucketItem extends Component {
     }
 
     showAlertOnRequestFailure = () => {
-        if ((this.props.getSingleResponse.status &&
+        if ((this.props.getSingleResponse.status !== undefined &&
             this.props.getSingleResponse.status !== 0) ||
             (this.props.saveBucketResponse.status &&
             this.props.saveBucketResponse.status !== 0)) {
