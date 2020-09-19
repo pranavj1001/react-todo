@@ -126,7 +126,8 @@ $BODY$;
 
 
 
-CREATE OR REPLACE FUNCTION public.get_all_buckets(
+CREATE OR REPLACE FUNCTION public.get_buckets(
+	par_id uuid DEFAULT NULL::uuid
 	)
     RETURNS json
     LANGUAGE 'plpgsql'
@@ -140,20 +141,37 @@ BEGIN
 	var_statuscode := 0;
 	var_error := '';
 	BEGIN
-		var_data := (SELECT json_agg(t) FROM (
-						SELECT 
-							id, 
-							title, 
-                            color,
-                            createddate,
-                            modifieddate
-						FROM 
-							buckets 
-						WHERE 
-							isactive = true
-						ORDER BY
-							createddate
-					) t)::json;
+		IF par_id IS NOT NULL THEN
+			var_data := (SELECT json_agg(t) FROM (
+							SELECT 
+								id, 
+								title, 
+								color,
+								createddate,
+								modifieddate
+							FROM 
+								buckets 
+							WHERE 
+								isactive = true
+								AND
+								id = par_id
+						) t)::json;
+		ELSE
+			var_data := (SELECT json_agg(t) FROM (
+							SELECT 
+								id, 
+								title, 
+								color,
+								createddate,
+								modifieddate
+							FROM 
+								buckets 
+							WHERE 
+								isactive = true
+							ORDER BY
+								createddate
+						) t)::json;
+		END IF;
 		
 		EXCEPTION WHEN others THEN
 			var_statuscode := 3;
@@ -284,7 +302,8 @@ END;
 $BODY$;
 
 
-CREATE OR REPLACE FUNCTION public.get_all_todos(
+CREATE OR REPLACE FUNCTION public.get_todos(
+	par_id uuid DEFAULT NULL::uuid
 	)
     RETURNS json
     LANGUAGE 'plpgsql'
@@ -298,33 +317,71 @@ BEGIN
 	var_statuscode := 0;
 	var_error := '';
 	BEGIN
-		var_data := (SELECT json_agg(t1) FROM (
-						SELECT 
-							id, 
-							title, 
-							content, 
-							iscompleted,
-							(
-								SELECT 
-									json_agg(t2) 
-								FROM (
+		IF par_id IS NOT NULL THEN
+			var_data := (SELECT json_agg(t1) FROM (
+							SELECT 
+								id, 
+								title, 
+								content, 
+								iscompleted,
+								(
 									SELECT 
-										tbm.bucketid 
-									FROM 
-										todos_buckets_mapping tbm
-									WHERE 
-										tbm.todoid = tot.id
-								) t2
-							) AS buckets,
-							createddate,
-							modifieddate
-						FROM 
-							todos tot
-						WHERE 
-							isactive = true
-						ORDER BY
-							createddate
-					) t1)::json;
+										json_agg(t2) 
+									FROM (
+										SELECT 
+											buc.id, buc.title, buc.color
+										FROM 
+											todos_buckets_mapping tbm
+										INNER JOIN
+											buckets buc
+										ON
+											buc.id = tbm.bucketid
+										WHERE 
+											tbm.todoid = tot.id
+									) t2
+								) AS buckets,
+								createddate,
+								modifieddate
+							FROM 
+								todos tot
+							WHERE 
+								isactive = true
+								AND
+								tot.id = par_id
+						) t1)::json;
+		ELSE
+			var_data := (SELECT json_agg(t1) FROM (
+							SELECT 
+								id, 
+								title, 
+								content, 
+								iscompleted,
+								(
+									SELECT 
+										json_agg(t2) 
+									FROM (
+										SELECT 
+											buc.id, buc.title, buc.color
+										FROM 
+											todos_buckets_mapping tbm
+										INNER JOIN
+											buckets buc
+										ON
+											buc.id = tbm.bucketid
+										WHERE 
+											tbm.todoid = tot.id
+									) t2
+								) AS buckets,
+								createddate,
+								modifieddate
+							FROM 
+								todos tot
+							WHERE 
+								isactive = true
+							ORDER BY
+								createddate
+						) t1)::json;
+		END IF;
 		
 		EXCEPTION WHEN others THEN
 			var_statuscode := 3;

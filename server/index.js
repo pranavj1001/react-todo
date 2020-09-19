@@ -61,33 +61,35 @@ app.get('/', (req, res) => {
 });
 
 // TODO APIs
-app.get('/gettodos', async (req, res) => {
-    const values = await pgClient.query('select get_all_todos()');
-    res.send(values.rows);
+app.post('/gettodos', async (req, res) => {
+    const values = await pgClient.query('select get_todos($1)', [req.body.id]);
+    res.send(values.rows[0].get_todos);
 });
 app.post('/savetodo', async (req, res) => {
+    const { id, title, content, isCompleted, buckets, isBucketChanged } = req.body;
     const values = await pgClient.query(
         'select save_todo($1::uuid, $2, $3, $4::bool, $5::uuid[], $6::bool)', 
-        [req.body.id, req.body.title, req.body.content, req.body.isCompleted, req.body.buckets, req.body.isBucketChanged]);
-    res.send(values.rows);
+        [id, title, content, isCompleted, buckets, isBucketChanged]);
+    res.send(values.rows[0].save_todo);
 });
 app.post('/removetodo', async (req, res) => {
     const values = await pgClient.query('select remove_todo($1::uuid)', [req.body.id]);
-    res.send(values.rows);
+    res.send(values.row[0].remove_todo);
 });
 
 // Buckets APIs
-app.get('/getbuckets', async (req, res) => {
-    const values = await pgClient.query('select get_all_buckets()');
-    res.send(values.rows);
+app.post('/getbuckets', async (req, res) => {
+    const values = await pgClient.query('select get_buckets($1)', [req.body.id]);
+    res.send(values.rows[0].get_buckets);
 });
 app.post('/savebucket', async (req, res) => {
-    const values = await pgClient.query('select save_bucket($1::uuid, $2, $3)', [req.body.id, req.body.title, req.body.color]);
-    res.send(values.rows);
+    const { id, title, color } = req.body;
+    const values = await pgClient.query('select save_bucket($1::uuid, $2, $3)', [id, title, color]);
+    res.send(values.rows[0].save_bucket);
 });
 app.post('/removebucket', async (req, res) => {
     const values = await pgClient.query('select remove_bucket($1::uuid)', [req.body.id]);
-    res.send(values.rows);
+    res.send(values.rows[0].remove_bucket);
 });
 
 app.listen(5000, error => {
