@@ -10,6 +10,8 @@ import './App.css';
 import Header from '../header/header';
 import TodosShowcase from '../todos-showcase/todos-showcase';
 import BucketsShowcase from '../buckets-showcase/buckets-showcase';
+import TodoItem from '../todo-item/todo-item';
+import BucketItem from '../bucket-item/bucket-item';
 import Home from '../home/home';
 import Footer from '../footer/footer';
 
@@ -24,8 +26,14 @@ function App() {
           <Route path="/todos">
             <TodosShowcase />
           </Route>
+          <Route path="/todo/addedit/:todoId?">
+            <TodoItem />
+          </Route>
           <Route path="/buckets">
             <BucketsShowcase />
+          </Route>
+          <Route path="/bucket/addedit/:bucketId?">
+            <BucketItem />
           </Route>
           <Route path="/">
             <Home />

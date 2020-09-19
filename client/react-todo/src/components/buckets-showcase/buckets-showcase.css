@@ -1,0 +1,43 @@
+.bucket-showcase--tools {
+    margin-top: 15px;
+}
+
+.bucket-showcase--link {
+    color: #555555;
+    font-size: 1.3rem;
+}
+
+.bucket-showcase--link:hover, .bucket-showcase--button:hover {
+    color: #333333;
+    text-decoration: none;
+}
+
+.bucket-showcase--row {
+    margin-top: 15px;
+}
+
+.bucket-showcase--tile {
+    margin-bottom: 10px;
+}
+
+.bucket-showcase--button {
+    margin-right: 5px;
+    background-color: #dddddd;
+    color: #555555;
+}
+
+.bucket-showcase--search-input-group {
+    width: 100%;
+    max-width: 500px;
+}
+
+.bucket-showcase--alert, .bucket-showcase--primary {
+    margin-left: 15px;
+    margin-right: 15px;
+}
+
+@media (min-width: 786px) {
+    .bucket-showcase--button {
+        float: right;
+    }
+}

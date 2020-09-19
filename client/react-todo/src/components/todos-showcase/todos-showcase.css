@@ -1,0 +1,43 @@
+.todo-showcase--tools {
+    margin-top: 15px;
+}
+
+.todo-showcase--link {
+    color: #555555;
+    font-size: 1.3rem;
+}
+
+.todo-showcase--link:hover, .todo-showcase--button:hover {
+    color: #333333;
+    text-decoration: none;
+}
+
+.todo-showcase--row {
+    margin-top: 15px;
+}
+
+.todo-showcase--tile {
+    margin-bottom: 10px;
+}
+
+.todo-showcase--button {
+    margin-right: 5px;
+    background-color: #dddddd;
+    color: #555555;
+}
+
+.todo-showcase--search-input-group {
+    width: 100%;
+    max-width: 500px;
+}
+
+.todo-showcase--alert, .todo-showcase--primary {
+    margin-left: 15px;
+    margin-right: 15px;
+}
+
+@media (min-width: 786px) {
+    .todo-showcase--button {
+        float: right;
+    }
+}

@@ -1,5 +1,4 @@
-.home-tile--main-div {
-    background-color: #4267b2;
+.tile--main-div {
     border-radius: 10px;
     padding: 15px;
     color: #ffffff;
@@ -13,27 +12,27 @@
     transition: box-shadow 500ms;
 }
 
-.home-tile--main-div:hover {
+.tile--main-div:hover {
     box-shadow: none;
     transition: box-shadow 700ms;
 }
 
-.home-tile--link:hover {
+.tile--link:hover {
     text-decoration: none;
 }
 
-.home-tile--paragraph {
+.tile--paragraph {
     margin-bottom: 5px;
 }
 
-.home-tile--paragraph-heading {
+.tile--paragraph-heading {
     font-size: 1.5rem;
 }
 
-.home-tile--paragraph-content {
+.tile--paragraph-content {
     font-size: 1.1rem;
 }
 
-.home-tile--paragraph-click-message {
+.tile--paragraph-click-message {
     font-size: 0.9rem;
 }
