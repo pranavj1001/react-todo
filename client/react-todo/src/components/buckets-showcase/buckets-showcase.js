@@ -36,7 +36,7 @@ class BucketsShowcase extends Component {
             bucket.color = '#' + bucket.color;
             return (
                 <div key={bucket.id} className="col-md-6 col-xl-3 bucket-showcase--tile">
-                    <Tile data={bucket} />
+                    <Tile data={bucket} customClassName="tile--paragraph-heading-invert-colors" />
                 </div>
             );
         });

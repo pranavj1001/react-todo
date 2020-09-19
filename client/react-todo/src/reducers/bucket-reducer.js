@@ -6,7 +6,8 @@ import {
     BUCKET_COLOR_CHANGED,
     BUCKET_VALIDATION_MESSAGE_CHANGED, 
     SAVE_BUCKET, 
-    REMOVE_BUCKET, RESET_BUCKET_STATE
+    REMOVE_BUCKET, 
+    RESET_BUCKET_STATE
 } from '../actions/types';
 
 const INITIAL_STATE = {
@@ -19,8 +20,8 @@ const INITIAL_STATE = {
     modifiedDateMesage: "",
     getSingleResponse: {},
     getListResponse: {},
-    saveBucketResponse: {},
-    removeBucketResponse: {},
+    saveResponse: {},
+    removeResponse: {},
     validationMessage: ""
 };
 
@@ -56,9 +57,9 @@ export default (state = INITIAL_STATE, action) => {
             }
             return {...state, getSingleResponse: action.payload };
         case SAVE_BUCKET:
-            return {...state, saveBucketResponse: action.payload };
+            return {...state, saveResponse: action.payload };
         case REMOVE_BUCKET:
-            return {...state, removeBucketResponse: action.payload };
+            return {...state, removeResponse: action.payload };
         case BUCKET_ID_CHANGED:
             return {...state, id: action.payload };
         case BUCKET_TITLE_CHANGED:

@@ -2,13 +2,14 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Link } from "react-router-dom";
 
-import { getTodoList } from '../../actions/todo-actions';
+import { getTodoList, resetTodo } from '../../actions/todo-actions';
 import Tile from '../tile/tile';
 
 import './todos-showcase.css';
 
 class TodosShowcase extends Component {
     componentDidMount() {
+        this.props.resetTodo();
         this.props.getTodoList();
     }
 
@@ -78,7 +79,7 @@ class TodosShowcase extends Component {
 }
 
 const mapStateToProps = ({ todoData }) => {
-    return { todoData }
+    return { todoData: todoData.getListResponse }
 };
 
-export default connect(mapStateToProps, { getTodoList })(TodosShowcase);
+export default connect(mapStateToProps, { getTodoList, resetTodo })(TodosShowcase);

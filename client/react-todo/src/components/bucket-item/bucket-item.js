@@ -47,9 +47,9 @@ class BucketItem extends Component {
     }
 
     showAlertOnSuccessfulSave = () => {
-        if (this.props.saveBucketResponse.status !== undefined &&
-            this.props.saveBucketResponse.status === 0) {
-                console.log(this.props.saveBucketResponse.status);
+        if (this.props.saveResponse.status !== undefined &&
+            this.props.saveResponse.status === 0) {
+                console.log(this.props.saveResponse.status);
                 return (
                     <div className="alert alert-success bucket-item--alert" role="alert">
                         Changes were saved successfully
@@ -61,8 +61,8 @@ class BucketItem extends Component {
     showAlertOnRequestFailure = () => {
         if ((this.props.getSingleResponse.status !== undefined &&
             this.props.getSingleResponse.status !== 0) ||
-            (this.props.saveBucketResponse.status &&
-            this.props.saveBucketResponse.status !== 0)) {
+            (this.props.saveResponse.status &&
+            this.props.saveResponse.status !== 0)) {
             return (
                 <div className="alert alert-danger bucket-item--alert" role="alert">
                     Server might be under maintainence. Please try again later.
@@ -193,7 +193,7 @@ const mapStateToProps = ({ bucketData }) => {
         modifiedDateMesage, 
         validationMessage, 
         getSingleResponse,
-        saveBucketResponse
+        saveResponse
     } = bucketData;
     return { 
         id, 
@@ -203,7 +203,7 @@ const mapStateToProps = ({ bucketData }) => {
         modifiedDateMesage, 
         validationMessage, 
         getSingleResponse,
-        saveBucketResponse
+        saveResponse
     };
 };
 
