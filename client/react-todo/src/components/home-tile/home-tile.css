@@ -18,6 +18,10 @@
     transition: box-shadow 700ms;
 }
 
+.home-tile--link:hover {
+    text-decoration: none;
+}
+
 .home-tile--paragraph {
     margin-bottom: 5px;
 }
