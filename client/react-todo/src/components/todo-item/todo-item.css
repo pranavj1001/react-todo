@@ -43,3 +43,16 @@
 .todo-item--input-checkbox {
     left: 160px;
 }
+
+.todo-item--dropdown-button {
+    display: inline-block;
+}
+
+.todo-item--dropdown-input:hover {
+    cursor: pointer;
+}
+
+.todo-item--dropdown-menu {
+    max-height: 180px;
+    overflow-y: auto;
+}

@@ -8,6 +8,7 @@ import {
     RESET_TODO_STATE, 
     SAVE_TODO, 
     TODO_BUCKETS_CHANGED, 
+    TODO_BUCKET_DROPDOWN_TOGGLED, 
     TODO_COMPLETION_CHANGED, 
     TODO_CONTENT_CHANGED, 
     TODO_ID_CHANGED, 
@@ -53,6 +54,13 @@ export const bucketsChanged = (text) => {
 export const validationMessageChanged = (text) => {
     return {
         type: TODO_VALIDATION_MESSAGE_CHANGED,
+        payload: text
+    }
+};
+
+export const bucketDropdownToggled = (text) => {
+    return {
+        type: TODO_BUCKET_DROPDOWN_TOGGLED,
         payload: text
     }
 };

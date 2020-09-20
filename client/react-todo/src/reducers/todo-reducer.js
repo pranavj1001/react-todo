@@ -6,6 +6,7 @@ import {
     RESET_TODO_STATE, 
     SAVE_TODO, 
     TODO_BUCKETS_CHANGED, 
+    TODO_BUCKET_DROPDOWN_TOGGLED, 
     TODO_COMPLETION_CHANGED, 
     TODO_CONTENT_CHANGED, 
     TODO_ID_CHANGED, 
@@ -19,7 +20,9 @@ const INITIAL_STATE = {
     content: "",
     isCompleted: false,
     buckets: [],
+    bucketsInputString: "",
     isBucketChanged: true,
+    bucketDropdownToggle: false,
     createddate: "",
     modifieddate: "",
     createdDateMessage: "",
@@ -52,18 +55,27 @@ export default (state = INITIAL_STATE, action) => {
             return {...state, getListResponse: action.payload};
         case GET_SINGLE_TODO:
             if (action.payload.status === 0 && action.payload.data) {
+                const payload = action.payload.data[0];
+                let bucketString = '';
+                if (payload.buckets && payload.buckets.length > 0) {
+                    for (const bucket of payload.buckets) {
+                        bucketString += `#${bucket.title},`
+                    }
+                }
+
                 return {
                     ...state,
                     getSingleResponse: action.payload,
-                    id: action.payload.data[0].id,
-                    title: action.payload.data[0].title,
-                    content: action.payload.data[0].content,
-                    isCompleted: action.payload.data[0].iscompleted,
-                    buckets: action.payload.data[0].buckets,
-                    createddate: action.payload.data[0].createddate,
-                    modifieddate: action.payload.data[0].modifieddate,
-                    createdDateMessage: createCreationDateMessage(action.payload.data[0].createddate),
-                    modifiedDateMesage: createModifiedDateMessage(action.payload.data[0].modifieddate)
+                    id: payload.id,
+                    title: payload.title,
+                    content: payload.content,
+                    isCompleted: payload.iscompleted,
+                    buckets: payload.buckets,
+                    bucketsInputString: bucketString,
+                    createddate: payload.createddate,
+                    modifieddate: payload.modifieddate,
+                    createdDateMessage: createCreationDateMessage(payload.createddate),
+                    modifiedDateMesage: createModifiedDateMessage(payload.modifieddate)
                 };
             }
             return {...state, getSingleResponse: action.payload };
@@ -80,7 +92,9 @@ export default (state = INITIAL_STATE, action) => {
         case TODO_COMPLETION_CHANGED:
             return {...state, isCompleted: action.payload };
         case TODO_BUCKETS_CHANGED:
-            return {...state, buckets: action.payload }; 
+            return {...state, buckets: action.payload };
+        case TODO_BUCKET_DROPDOWN_TOGGLED:
+            return {...state, bucketDropdownToggle: action.payload }; 
         case TODO_VALIDATION_MESSAGE_CHANGED:
             return {...state, validationMessage: action.payload };
         default:

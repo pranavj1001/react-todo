@@ -12,12 +12,14 @@ import {
     completionChanged,
     validationMessageChanged,
     saveTodo,
-    removeTodo
+    removeTodo,
+    bucketDropdownToggled
 } from '../../actions/todo-actions';
 
 import './todo-item.css';
 
 class TodoItem extends Component {
+
     componentDidMount() {
         const { todoId } = this.props.match.params;
         if (todoId) {
@@ -40,6 +42,10 @@ class TodoItem extends Component {
 
     onBucketsChange = (newBuckets) => {
         this.props.bucketsChanged(newBuckets);
+    }
+
+    toggleBucketDropdown = () => {
+        this.props.bucketDropdownToggled(!this.props.bucketDropdownToggle);
     }
 
     showTodoAdditonalInfo = () => {
@@ -70,6 +76,33 @@ class TodoItem extends Component {
         if (response.status === 0) {
             this.props.history.push('/todos');
         }
+    }
+
+    renderBucketsList = () => {
+        if (this.props.getBucketListResponse.status !== undefined &&
+            this.props.getBucketListResponse.status === 0) {
+                if (this.props.getBucketListResponse.data &&
+                    this.props.getBucketListResponse.data.length > 0) {
+                        return this.props.getBucketListResponse.data.map(bucket => {
+                            return (
+                            <React.Fragment>
+                                <button className="dropdown-item todo-item--dropdown-button" type="button">
+                                    <input type="checkbox" className="form-check-input todo-item--dropdown-input"></input>
+                                    {bucket.title}
+                                </button>
+                            </React.Fragment>
+                            );
+                        });
+                    } else {
+                        return (
+                            <button className="dropdown-item" type="button">Please add a bucket.</button>
+                        );
+                    }
+            } else {
+                return (
+                    <button className="dropdown-item" type="button">Some Error Occurred.</button>
+                );
+            }
     }
 
     showAlertOnSuccessfulSave = () => {
@@ -218,6 +251,23 @@ class TodoItem extends Component {
                             </div>
                         </div>
                     </div>
+                    <div className="row">
+                        <div className="col-md-10">
+                            <div className="input-group mb-3 todo-item--search-input-group">
+                                <div className="input-group-prepend">
+                                    <span className="input-group-text todo-item--input-text" id="inputGroup-sizing-default">Buckets:</span>
+                                </div>
+                                <div className="dropdown">
+                                <button className="btn btn-secondary dropdown-toggle" type="button" id="bucketsdropdown" onClick={this.toggleBucketDropdown}>
+                                    {this.props.bucketsInputString}
+                                </button>
+                                <div className="dropdown-menu todo-item--dropdown-menu" aria-labelledby="bucketsdropdown" style={{display: (this.props.bucketDropdownToggle ? 'block' : 'none')}}>
+                                    {this.renderBucketsList()}
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 {this.showTodoAdditonalInfo()}
@@ -236,12 +286,15 @@ const mapStateToProps = ({ todoData }) => {
         content,
         isCompleted,
         buckets,
+        bucketsInputString,
         createdDateMessage, 
         modifiedDateMesage, 
         validationMessage, 
         getSingleResponse,
         saveResponse,
-        removeResponse
+        removeResponse,
+        getBucketListResponse,
+        bucketDropdownToggle
     } = todoData;
     return { 
         id, 
@@ -249,12 +302,15 @@ const mapStateToProps = ({ todoData }) => {
         content,
         isCompleted,
         buckets,
+        bucketsInputString,
         createdDateMessage, 
         modifiedDateMesage, 
         validationMessage, 
         getSingleResponse,
         saveResponse,
-        removeResponse
+        removeResponse,
+        getBucketListResponse,
+        bucketDropdownToggle
     };
 };
 
@@ -269,5 +325,6 @@ connect(mapStateToProps, {
     completionChanged,
     validationMessageChanged,
     saveTodo,
-    removeTodo
+    removeTodo,
+    bucketDropdownToggled
 })(TodoItem);
