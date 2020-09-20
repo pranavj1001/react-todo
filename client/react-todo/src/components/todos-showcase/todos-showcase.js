@@ -66,7 +66,7 @@ class TodosShowcase extends Component {
                         </div>
                         <div className="col-md-8 todo-showcase--tools-buttons">
                             <Link to="/todo/addedit/" className="btn btn-default todo-showcase--button">Add Todo</Link>
-                            <Link to="/bucket/addedit/" className="btn btn-default todo-showcase--button">Add Category</Link>
+                            <Link to="/bucket/addedit/" className="btn btn-default todo-showcase--button">Add Bucket</Link>
                         </div>
                     </div>
                 </div>

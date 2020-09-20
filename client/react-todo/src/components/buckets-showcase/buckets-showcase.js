@@ -63,7 +63,7 @@ class BucketsShowcase extends Component {
                         </div>
                         <div className="col-md-8 bucket-showcase--tools-buttons">
                             <Link to="/todo/addedit/" className="btn btn-default bucket-showcase--button">Add Todo</Link>
-                            <Link to="/bucket/addedit/" className="btn btn-default bucket-showcase--button">Add Category</Link>
+                            <Link to="/bucket/addedit/" className="btn btn-default bucket-showcase--button">Add Bucket</Link>
                         </div>
                     </div>
                 </div>
