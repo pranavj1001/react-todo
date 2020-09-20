@@ -13,7 +13,9 @@ import {
     validationMessageChanged,
     saveTodo,
     removeTodo,
-    bucketDropdownToggled
+    bucketDropdownToggled,
+    bucketRenderListChanged,
+    bucketInputStringChanged
 } from '../../actions/todo-actions';
 
 import './todo-item.css';
@@ -42,6 +44,31 @@ class TodoItem extends Component {
 
     onBucketsChange = (newBuckets) => {
         this.props.bucketsChanged(newBuckets);
+    }
+
+    onBucketRenderListChange = (newBuckets) => {
+        this.props.bucketRenderListChanged(newBuckets);
+    }
+
+    onBucketInputStringChange = (text) => {
+        this.props.bucketInputStringChanged(text);
+    }
+
+    onBucketDropDownChange = (event) => {
+        const bucketId = event.target.getAttribute('bucketid');
+        const checked = event.target.checked;
+        const array = this.props.bucketRenderList;
+        let bucketSelectedString = '';
+        for (const item of array) {
+            if (item.id === bucketId)  {
+                item.checked = checked;
+            }
+            if (item.checked) {
+                bucketSelectedString += `#${item.title},`; 
+            }
+        }
+        this.onBucketRenderListChange(array);
+        this.onBucketInputStringChange(bucketSelectedString);
     }
 
     toggleBucketDropdown = () => {
@@ -78,29 +105,61 @@ class TodoItem extends Component {
         }
     }
 
+    prepareBucketRenderList = () => {
+        let array = [];
+        for (const bucket of this.props.getBucketListResponse.data) {
+            let object = {
+                id: bucket.id,
+                title: bucket.title,
+                color: bucket.color,
+                checked: false
+            };
+            for (const bucketSelect of this.props.buckets) {
+                if (bucketSelect.id === bucket.id) {
+                    object.checked = true;
+                    break;
+                }
+            }
+            array.push(object);
+        }
+        this.onBucketRenderListChange(array);
+    }
+
     renderBucketsList = () => {
         if (this.props.getBucketListResponse.status !== undefined &&
             this.props.getBucketListResponse.status === 0) {
                 if (this.props.getBucketListResponse.data &&
                     this.props.getBucketListResponse.data.length > 0) {
-                        return this.props.getBucketListResponse.data.map(bucket => {
-                            return (
-                            <React.Fragment>
-                                <button className="dropdown-item todo-item--dropdown-button" type="button">
-                                    <input type="checkbox" className="form-check-input todo-item--dropdown-input"></input>
-                                    {bucket.title}
-                                </button>
-                            </React.Fragment>
-                            );
-                        });
+                        if (this.props.bucketRenderList && this.props.bucketRenderList.length > 0) {
+
+                            return this.props.bucketRenderList.map(bucket => {
+                                return (
+                                    <React.Fragment key={bucket.id}>
+                                        <div className="dropdown-item todo-item--dropdown-item">
+                                            <input 
+                                                type="checkbox" 
+                                                className="form-check-input todo-item--dropdown-input" 
+                                                key={bucket.id}
+                                                bucketid={bucket.id}
+                                                onChange={this.onBucketDropDownChange}
+                                                defaultChecked={bucket.checked}
+                                            ></input>
+                                            {bucket.title}
+                                        </div>
+                                    </React.Fragment>
+                                );
+                            });
+                        } else {
+                            this.prepareBucketRenderList();
+                        }
                     } else {
                         return (
-                            <button className="dropdown-item" type="button">Please add a bucket.</button>
+                            <div className="dropdown-item">Please add a bucket.</div>
                         );
                     }
             } else {
                 return (
-                    <button className="dropdown-item" type="button">Some Error Occurred.</button>
+                    <div className="dropdown-item">Some Error Occurred.</div>
                 );
             }
     }
@@ -157,7 +216,7 @@ class TodoItem extends Component {
                 this.props.title,
                 this.props.content,
                 this.props.isCompleted,
-                this.props.buckets,
+                this.props.bucketRenderList,
                 this.redirectOnANewItem
             );
         }
@@ -294,7 +353,8 @@ const mapStateToProps = ({ todoData }) => {
         saveResponse,
         removeResponse,
         getBucketListResponse,
-        bucketDropdownToggle
+        bucketDropdownToggle,
+        bucketRenderList
     } = todoData;
     return { 
         id, 
@@ -310,7 +370,8 @@ const mapStateToProps = ({ todoData }) => {
         saveResponse,
         removeResponse,
         getBucketListResponse,
-        bucketDropdownToggle
+        bucketDropdownToggle,
+        bucketRenderList
     };
 };
 
@@ -326,5 +387,7 @@ connect(mapStateToProps, {
     validationMessageChanged,
     saveTodo,
     removeTodo,
-    bucketDropdownToggled
+    bucketDropdownToggled,
+    bucketRenderListChanged,
+    bucketInputStringChanged
 })(TodoItem);

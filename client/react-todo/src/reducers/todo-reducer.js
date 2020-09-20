@@ -6,7 +6,9 @@ import {
     RESET_TODO_STATE, 
     SAVE_TODO, 
     TODO_BUCKETS_CHANGED, 
+    TODO_BUCKETS_RENDER_LIST_CHANGED, 
     TODO_BUCKET_DROPDOWN_TOGGLED, 
+    TODO_BUCKET_INPUT_STRING_CHANGED, 
     TODO_COMPLETION_CHANGED, 
     TODO_CONTENT_CHANGED, 
     TODO_ID_CHANGED, 
@@ -32,7 +34,8 @@ const INITIAL_STATE = {
     getBucketListResponse: {},
     saveResponse: {},
     removeResponse: {},
-    validationMessage: ""
+    validationMessage: "",
+    bucketRenderList: []
 };
 
 const createModifiedDateMessage = (dateString) => {
@@ -70,7 +73,7 @@ export default (state = INITIAL_STATE, action) => {
                     title: payload.title,
                     content: payload.content,
                     isCompleted: payload.iscompleted,
-                    buckets: payload.buckets,
+                    buckets: payload.buckets ? payload.buckets : [],
                     bucketsInputString: bucketString,
                     createddate: payload.createddate,
                     modifieddate: payload.modifieddate,
@@ -94,9 +97,13 @@ export default (state = INITIAL_STATE, action) => {
         case TODO_BUCKETS_CHANGED:
             return {...state, buckets: action.payload };
         case TODO_BUCKET_DROPDOWN_TOGGLED:
-            return {...state, bucketDropdownToggle: action.payload }; 
+            return {...state, bucketDropdownToggle: action.payload };
+        case TODO_BUCKETS_RENDER_LIST_CHANGED:
+            return {...state, bucketRenderList: action.payload };
         case TODO_VALIDATION_MESSAGE_CHANGED:
             return {...state, validationMessage: action.payload };
+        case TODO_BUCKET_INPUT_STRING_CHANGED:
+            return {...state, bucketsInputString: action.payload };
         default:
             return state;
     }

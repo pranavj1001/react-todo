@@ -8,7 +8,9 @@ import {
     RESET_TODO_STATE, 
     SAVE_TODO, 
     TODO_BUCKETS_CHANGED, 
+    TODO_BUCKETS_RENDER_LIST_CHANGED, 
     TODO_BUCKET_DROPDOWN_TOGGLED, 
+    TODO_BUCKET_INPUT_STRING_CHANGED, 
     TODO_COMPLETION_CHANGED, 
     TODO_CONTENT_CHANGED, 
     TODO_ID_CHANGED, 
@@ -16,52 +18,66 @@ import {
     TODO_VALIDATION_MESSAGE_CHANGED,
 } from './types';
 
-export const idChanged = (text) => {
+export const idChanged = (update) => {
     return {
         type: TODO_ID_CHANGED,
-        payload: text
+        payload: update
     }
 };
 
-export const titleChanged = (text) => {
+export const titleChanged = (update) => {
     return {
         type: TODO_TITLE_CHANGED,
-        payload: text
+        payload: update
     }
 };
 
-export const contentChanged = (text) => {
+export const contentChanged = (update) => {
     return {
         type: TODO_CONTENT_CHANGED,
-        payload: text
+        payload: update
     }
 };
 
-export const completionChanged = (text) => {
+export const completionChanged = (update) => {
     return {
         type: TODO_COMPLETION_CHANGED,
-        payload: text
+        payload: update
     }
 };
 
-export const bucketsChanged = (text) => {
+export const bucketsChanged = (update) => {
     return {
         type: TODO_BUCKETS_CHANGED,
-        payload: text
+        payload: update
     }
 };
 
-export const validationMessageChanged = (text) => {
+export const validationMessageChanged = (update) => {
     return {
         type: TODO_VALIDATION_MESSAGE_CHANGED,
-        payload: text
+        payload: update
     }
 };
 
-export const bucketDropdownToggled = (text) => {
+export const bucketDropdownToggled = (update) => {
     return {
         type: TODO_BUCKET_DROPDOWN_TOGGLED,
-        payload: text
+        payload: update
+    }
+};
+
+export const bucketRenderListChanged = (update) => {
+    return {
+        type: TODO_BUCKETS_RENDER_LIST_CHANGED,
+        payload: update
+    }
+};
+
+export const bucketInputStringChanged = (update) => {
+    return {
+        type: TODO_BUCKET_INPUT_STRING_CHANGED,
+        payload: update
     }
 };
 
@@ -81,12 +97,15 @@ export const saveTodo = (id, title, content, isCompleted, buckets = [], callback
     const bucketArray = [];
     if (buckets) {
         for (const bucket of buckets) {
-            bucketArray.push(bucket.id);
+            if (bucket.checked) {
+                bucketArray.push(bucket.id);
+            }
         }
     }
+    buckets = bucketArray;
     const response = await axios.post(
         '/api/savetodo', 
-        { id, title, content, isCompleted, bucketArray, isBucketChanged: true });
+        { id, title, content, isCompleted, buckets, isBucketChanged: true });
 
     dispatch({type: SAVE_TODO, payload: response.data});
     callback(response.data);

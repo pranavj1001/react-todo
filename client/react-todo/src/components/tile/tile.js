@@ -9,7 +9,7 @@ class Tile extends Component {
         if (this.props.data && this.props.data.buckets) {
             return this.props.data.buckets.map(bucket => {
                 return (
-                    <p className="tile--paragraph tile--paragraph-content">#{bucket.title}</p>
+                    <p key={bucket.id} className="tile--paragraph tile--paragraph-content">#{bucket.title}</p>
                 );
             });
         }

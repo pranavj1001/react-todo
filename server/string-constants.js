@@ -227,7 +227,7 @@ BEGIN
 				VALUES
 					(
 						uuid_generate_v4(),
-						var_todoid,
+						par_id,
 						UNNEST(par_buckets)
 					);
 			END IF;
