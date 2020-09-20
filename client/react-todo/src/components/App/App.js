@@ -26,9 +26,7 @@ function App() {
           <Route path="/todos">
             <TodosShowcase />
           </Route>
-          <Route path="/todo/addedit/:todoId?">
-            <TodoItem />
-          </Route>
+          <Route path="/todo/addedit/:todoId?" component={TodoItem} />
           <Route path="/buckets">
             <BucketsShowcase />
           </Route>

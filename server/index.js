@@ -74,7 +74,7 @@ app.post('/savetodo', async (req, res) => {
 });
 app.post('/removetodo', async (req, res) => {
     const values = await pgClient.query('select remove_todo($1::uuid)', [req.body.id]);
-    res.send(values.row[0].remove_todo);
+    res.send(values.rows[0].remove_todo);
 });
 
 // Buckets APIs

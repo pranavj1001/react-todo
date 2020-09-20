@@ -46,13 +46,26 @@ class BucketItem extends Component {
             }
     }
 
+    redirectOnANewItem = (response) => {
+        if (response.status === 0) {
+            if (!this.props.id) {
+                this.props.history.push('/buckets');
+            }
+        }
+    }
+
+    redirectOnSuccessfulDelete = (response) => {
+        if (response.status === 0) {
+            this.props.history.push('/buckets');
+        }
+    }
+
     showAlertOnSuccessfulSave = () => {
         if (this.props.saveResponse.status !== undefined &&
             this.props.saveResponse.status === 0) {
-                console.log(this.props.saveResponse.status);
                 return (
                     <div className="alert alert-success bucket-item--alert" role="alert">
-                        Changes were saved successfully
+                        Changes were saved successfully.
                     </div>
                 );
             }
@@ -61,11 +74,13 @@ class BucketItem extends Component {
     showAlertOnRequestFailure = () => {
         if ((this.props.getSingleResponse.status !== undefined &&
             this.props.getSingleResponse.status !== 0) ||
-            (this.props.saveResponse.status &&
-            this.props.saveResponse.status !== 0)) {
+            (this.props.saveResponse.status !== undefined &&
+            this.props.saveResponse.status !== 0) || 
+            (this.props.removeResponse.status !== undefined &&
+                this.props.removeResponse.status !== 0)) {
             return (
                 <div className="alert alert-danger bucket-item--alert" role="alert">
-                    Server might be under maintainence. Please try again later.
+                    Some Error occurred. Please try again later.
                 </div>
             );
         }
@@ -95,15 +110,15 @@ class BucketItem extends Component {
             this.props.saveBucket(
                 this.props.id,
                 this.props.title,
-                this.props.color
+                this.props.color,
+                this.redirectOnANewItem
             );
         }
     }
 
     removeBucket = () => {
         if (window.confirm('Are you sure you want to delete?')) {
-            this.props.removeBucket(this.props.id);
-            this.props.history.push('/buckets');
+            this.props.removeBucket(this.props.id, this.redirectOnSuccessfulDelete);
         }
     }
 
@@ -126,7 +141,6 @@ class BucketItem extends Component {
     }
 
     render() {
-        
         return (
             <div className="bucket-item--main-div">
                 <Link to="/buckets" className="bucket-item--link">❮ Go Back to Buckets List</Link>
@@ -193,7 +207,8 @@ const mapStateToProps = ({ bucketData }) => {
         modifiedDateMesage, 
         validationMessage, 
         getSingleResponse,
-        saveResponse
+        saveResponse,
+        removeResponse
     } = bucketData;
     return { 
         id, 
@@ -203,7 +218,8 @@ const mapStateToProps = ({ bucketData }) => {
         modifiedDateMesage, 
         validationMessage, 
         getSingleResponse,
-        saveResponse
+        saveResponse,
+        removeResponse
     };
 };
 

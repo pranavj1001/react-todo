@@ -52,16 +52,18 @@ export const getBucketList = (id) => async dispatch => {
     dispatch({type: GET_BUCKET_LIST, payload: response.data});
 };
 
-export const saveBucket = (id, title, color) => async dispatch => {
+export const saveBucket = (id, title, color, callback) => async dispatch => {
     const response = await axios.post('/api/saveBucket', { id, title, color });
 
     dispatch({type: SAVE_BUCKET, payload: response.data});
+    callback(response.data);
 };
 
-export const removeBucket = (id) => async dispatch => {
+export const removeBucket = (id, callback) => async dispatch => {
     const response = await axios.post('/api/removeBucket', { id });
 
     dispatch({type: REMOVE_BUCKET, payload: response.data});
+    callback(response.data);
 };
 
 export const resetBucketState = () => {

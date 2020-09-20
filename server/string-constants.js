@@ -47,21 +47,24 @@ BEGIN
 			var_statuscode := 1;
 			var_data := 'Bucket already exists.';
 		ELSIF par_bucketid IS NOT NULL THEN
-			IF EXISTS (SELECT * FROM buckets WHERE id = par_bucketid AND isactive = true) THEN
-				UPDATE 
-					buckets 
-				SET 
-					title = par_buckettitle, 
-					color = par_bucketcolor,
-					modifieddate = (select now())
-				WHERE 
-					id = par_bucketid;
-					var_statuscode := 0;
-				var_data := 'Bucket updated.';
-			ELSE
-				var_statuscode := 2;
-				var_data := 'Bucket is inactive.';
-			END IF;
+		IF EXISTS (SELECT * FROM buckets WHERE lower(title) = lower(par_buckettitle) AND id != par_bucketid AND isactive = true) THEN
+			var_statuscode := 1;
+			var_data := 'Bucket already exists.';
+		ELSIF EXISTS (SELECT * FROM buckets WHERE id = par_bucketid AND isactive = true) THEN
+			UPDATE 
+				buckets 
+			SET 
+				title = par_buckettitle, 
+				color = par_bucketcolor,
+				modifieddate = (select now())
+			WHERE 
+				id = par_bucketid;
+				var_statuscode := 0;
+			var_data := 'Bucket updated.';
+		ELSE
+			var_statuscode := 2;
+			var_data := 'Bucket is inactive.';
+		END IF;
 		ELSE
 			var_statuscode := 0;
 			INSERT INTO 

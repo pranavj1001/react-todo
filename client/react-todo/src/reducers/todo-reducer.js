@@ -1,4 +1,5 @@
 import {
+    GET_BUCKET_LIST,
     GET_SINGLE_TODO,
     GET_TODO_LIST, 
     REMOVE_TODO, 
@@ -25,6 +26,7 @@ const INITIAL_STATE = {
     modifiedDateMesage: "",
     getSingleResponse: {},
     getListResponse: {},
+    getBucketListResponse: {},
     saveResponse: {},
     removeResponse: {},
     validationMessage: ""
@@ -44,6 +46,8 @@ export default (state = INITIAL_STATE, action) => {
     switch (action.type) {
         case RESET_TODO_STATE:
             return INITIAL_STATE;
+        case GET_BUCKET_LIST:
+            return {...state, getBucketListResponse: action.payload};
         case GET_TODO_LIST:
             return {...state, getListResponse: action.payload};
         case GET_SINGLE_TODO:

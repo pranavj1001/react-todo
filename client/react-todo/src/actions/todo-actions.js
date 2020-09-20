@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 import {
+    GET_BUCKET_LIST,
     GET_SINGLE_TODO,
     GET_TODO_LIST, 
     REMOVE_TODO, 
@@ -68,22 +69,36 @@ export const getSingleTodo = (id) => async dispatch => {
     dispatch({type: GET_SINGLE_TODO, payload: response.data});
 };
 
-export const saveTodo = (id, title, content, isCompleted, buckets, isBucketChanged = true) => async dispatch => {
+export const saveTodo = (id, title, content, isCompleted, buckets = [], callback) => async dispatch => {
+    const bucketArray = [];
+    if (buckets) {
+        for (const bucket of buckets) {
+            bucketArray.push(bucket.id);
+        }
+    }
     const response = await axios.post(
         '/api/savetodo', 
-        { id, title, content, isCompleted, buckets });
+        { id, title, content, isCompleted, bucketArray, isBucketChanged: true });
 
     dispatch({type: SAVE_TODO, payload: response.data});
+    callback(response.data);
 };
 
-export const removeTodo = (id) => async dispatch => {
+export const removeTodo = (id, callback) => async dispatch => {
     const response = await axios.post('/api/removetodo', { id });
 
     dispatch({type: REMOVE_TODO, payload: response.data});
+    callback(response.data);
 };
 
 export const resetTodo = () => {
     return {
         type: RESET_TODO_STATE
     };
+};
+
+export const getBucketList = () => async dispatch => {
+    const response = await axios.post('/api/getbuckets');
+
+    dispatch({type: GET_BUCKET_LIST, payload: response.data});
 };

@@ -1,0 +1,45 @@
+.todo-item--form {
+    margin-top: 15px;
+}
+
+.todo-item--link {
+    color: #555555;
+    font-size: 1.3rem;
+}
+
+.todo-item--link:hover {
+    color: #333333;
+    text-decoration: none;
+}
+
+.todo-item--row {
+    margin-top: 15px;
+}
+
+.todo-item--tile {
+    margin-bottom: 10px;
+}
+
+.todo-item--button {
+    margin-right: 5px;
+    background-color: #dddddd;
+    color: #555555;
+}
+
+.todo-item--search-input-group {
+    width: 100%;
+    max-width: 500px;
+}
+
+.todo-item--alert {
+    margin-top: 10px;
+    max-width: 500px;
+}
+
+.todo-item--input-text {
+    min-width: 90px;
+}
+
+.todo-item--input-checkbox {
+    left: 160px;
+}
